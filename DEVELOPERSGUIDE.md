@@ -483,6 +483,66 @@ Follow BEM for class naming:
 .bk-plan-card--compact { }
 ```
 
+### Button Standards
+
+All buttons with icons and labels should follow this pattern for consistent spacing and alignment:
+
+#### Action Buttons (Icon + Label)
+
+```css
+.bk-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px 16px;
+    min-height: 100px;
+    background: var(--bk-bg-card);
+    border: 1px solid var(--bk-border);
+    border-radius: var(--bk-radius-lg);
+    cursor: pointer;
+    transition: var(--bk-transition-bounce);
+    position: relative;
+    /* IMPORTANT: Do NOT use overflow: hidden - it clips content */
+}
+
+.bk-action-btn .action-icon {
+    font-size: 1.8em;
+    line-height: 1;
+    transition: var(--bk-transition);
+}
+
+.bk-action-btn .action-label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--bk-text);
+    line-height: 1.2;
+}
+```
+
+#### Key Rules for Action Buttons
+
+| Rule | Reason |
+|------|--------|
+| **Never use `overflow: hidden`** | Clips emoji icons and text labels |
+| **Use `justify-content: center`** | Vertically centers content |
+| **Set `min-height`** | Ensures consistent button sizing |
+| **Use `gap` for spacing** | Cleaner than margins on children |
+| **`line-height: 1` on icons** | Prevents extra space around emojis |
+
+#### Gradient Buttons
+
+When using gradient backgrounds on buttons, **always set explicit white text**:
+
+```css
+.my-gradient-btn {
+    background: var(--bk-gradient);
+    color: white !important;  /* Required - prevents black text inheritance */
+    border: none;
+}
+```
+
 ### Dark Mode Support
 
 Use Obsidian's CSS variables for automatic dark mode:

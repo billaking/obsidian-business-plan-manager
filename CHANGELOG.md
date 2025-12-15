@@ -5,6 +5,70 @@ All notable changes to the BK Business Plan Manager plugin will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2024-12-15
+
+### Added
+
+#### Products & Services (📦 Products tab) - Phase 3
+- **Products Overview**: Section header with "Add Product" button and real-time statistics
+- **Stats Dashboard**: Mini stat cards showing Total Products, Launched, In Development, and Ideas count
+- **Filter Tabs**: Quick filter tabs to view products by status (All, Launched, Development, Beta, Idea)
+- **Product Cards**: Rich product cards displaying:
+  - Product name with category icon
+  - SKU (auto-generated or custom)
+  - Status badge with color coding
+  - Description preview
+  - Features list as tags
+  - Pricing tiers with tier names and prices
+  - Custom tags for organization
+  - Action buttons (Edit, Duplicate, Delete)
+- **Empty State**: Helpful empty state with icon and CTA when no products exist
+- **Full CRUD Operations**: Create, Read, Update, and Delete products
+
+#### Product Modal (`ProductModal`)
+- **Basic Info Section**: Name, SKU (auto-generated), Category dropdown, Status dropdown
+- **Description**: Multi-line textarea for product details
+- **Features Management**: Add/remove product features as list items
+- **Pricing Tiers**: Sub-modal for managing tiered pricing with:
+  - Tier name (e.g., Basic, Pro, Enterprise)
+  - Price input
+  - Billing period (monthly/yearly/one-time/free)
+  - Edit and delete functionality
+- **Tags Management**: Flexible tag input for product categorization
+- **Save/Cancel actions**: Proper modal workflow
+
+#### Pricing Tier Modal (`PricingTierModal`)
+- Add and edit pricing tiers for products
+- Tier name, price, and billing period inputs
+- Integrated with ProductModal
+
+#### New Components
+- `renderProducts()`: Full products view with stats, filters, and product cards
+- `renderMiniStat()`: Stats row helper
+- `renderEmptyProductsState()`: Empty state with CTA
+- `filterProducts()`: Filter products by status
+- `renderProductCards()`: Product card rendering
+- `getCategoryIcon()`: Category-to-emoji mapping
+- `formatStatus()`: Status display formatting
+- `formatPrice()`: Price formatting with currency symbol
+- `ProductModal`: Full CRUD modal for products
+- `PricingTierModal`: Pricing tier management modal
+
+#### New Styles (~400 lines)
+- Section header layout (`.bk-section-header`)
+- Mini stats row (`.bk-products-stats`, `.bk-mini-stat`)
+- Filter tabs with active states (`.bk-filter-tabs`, `.bk-filter-tab`)
+- Product cards (`.bk-product-card`, `.bk-product-card-header`, `.bk-product-card-body`)
+- Status badges with color variants (`.product-status-badge`, `.status-*`)
+- Features and tags display (`.bk-feature-tag`, `.bk-tag`)
+- Pricing tiers display (`.bk-pricing-tier`, `.bk-tier-name`, `.bk-tier-price`)
+- Empty state styling (`.bk-empty-state`, `.bk-empty-cta`)
+- Modal sections (`.bk-modal-section`, `.bk-modal-list`)
+- Pricing tier items (`.bk-pricing-tier-item`)
+- Tags input field (`.bk-tags-input`)
+
+---
+
 ## [1.1.0] - 2024-12-15
 
 ### Added

@@ -1,7 +1,7 @@
 {
 	"id": "bk-business-plan-manager",
 	"name": "BK Business Plan Manager",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"minAppVersion": "0.15.0",
 	"description": "A comprehensive business plan manager for plugin developers and entrepreneurs. Plan, track, and grow your business with structured sections for products, marketing, finances, and milestones.",
 	"author": "BK",

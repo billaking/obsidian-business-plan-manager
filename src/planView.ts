@@ -6,6 +6,8 @@ import { App, ItemView, WorkspaceLeaf, Notice, Modal, Setting } from 'obsidian';
 import BKBusinessPlanPlugin from '../main';
 import {
 	BusinessPlan,
+	Product,
+	PricingTier,
 	formatCurrency,
 	formatDate,
 	calculateMonthlyRevenue,
@@ -13,7 +15,8 @@ import {
 	getProductsByStatus,
 	getMilestonesByStatus,
 	createNewPlan,
-	PlanTemplate
+	PlanTemplate,
+	generateId
 } from './planData';
 
 export const VIEW_TYPE_BUSINESS_PLAN = 'bk-business-plan-view';
@@ -787,15 +790,255 @@ export class BusinessPlanView extends ItemView {
 	}
 
 	// =========================================
-	// PRODUCTS (Placeholder)
+	// PRODUCTS & SERVICES
 	// =========================================
 	private renderProducts(container: HTMLElement) {
-		const section = container.createDiv({ cls: 'bk-section' });
-		section.createEl('h2', { text: '📦 Products & Services' });
-		section.createEl('p', { 
-			text: 'Coming in Phase 3: Product management, pricing tiers, and bundles.',
-			cls: 'bk-coming-soon'
+		const plan = this.getActivePlan();
+		if (!plan) {
+			container.createEl('p', { text: 'No plan selected', cls: 'bk-no-plan' });
+			return;
+		}
+
+		// Header with Add button
+		const header = container.createDiv({ cls: 'bk-section-header' });
+		header.createEl('h2', { text: '📦 Products & Services' });
+		
+		const addBtn = header.createEl('button', { text: '+ Add Product', cls: 'bk-btn-primary' });
+		addBtn.addEventListener('click', () => {
+			new ProductModal(this.app, this.plugin, plan, null, () => this.refresh()).open();
 		});
+
+		// Stats Row
+		const statsRow = container.createDiv({ cls: 'bk-products-stats' });
+		
+		const totalProducts = plan.products.length;
+		const launchedCount = plan.products.filter(p => p.status === 'launched').length;
+		const devCount = plan.products.filter(p => p.status === 'development' || p.status === 'beta').length;
+		const ideaCount = plan.products.filter(p => p.status === 'idea').length;
+		
+		this.renderMiniStat(statsRow, '📦', totalProducts.toString(), 'Total');
+		this.renderMiniStat(statsRow, '🚀', launchedCount.toString(), 'Launched');
+		this.renderMiniStat(statsRow, '🔧', devCount.toString(), 'In Dev');
+		this.renderMiniStat(statsRow, '💡', ideaCount.toString(), 'Ideas');
+
+		// Filter tabs
+		const filterTabs = container.createDiv({ cls: 'bk-filter-tabs' });
+		const filters = [
+			{ id: 'all', label: 'All', count: totalProducts },
+			{ id: 'launched', label: 'Launched', count: launchedCount },
+			{ id: 'development', label: 'In Development', count: plan.products.filter(p => p.status === 'development').length },
+			{ id: 'beta', label: 'Beta', count: plan.products.filter(p => p.status === 'beta').length },
+			{ id: 'idea', label: 'Ideas', count: ideaCount },
+		];
+		
+		filters.forEach(filter => {
+			const tab = filterTabs.createEl('button', { 
+				text: `${filter.label} (${filter.count})`,
+				cls: 'bk-filter-tab'
+			});
+			if (filter.id === 'all') tab.addClass('active');
+			
+			tab.addEventListener('click', () => {
+				filterTabs.querySelectorAll('.bk-filter-tab').forEach(t => t.removeClass('active'));
+				tab.addClass('active');
+				this.filterProducts(container, plan.products, filter.id);
+			});
+		});
+
+		// Products List
+		const productsList = container.createDiv({ cls: 'bk-products-list', attr: { 'data-products-list': 'true' } });
+		
+		if (plan.products.length === 0) {
+			this.renderEmptyProductsState(productsList);
+		} else {
+			this.renderProductCards(productsList, plan.products, plan);
+		}
+	}
+
+	private renderMiniStat(container: HTMLElement, icon: string, value: string, label: string) {
+		const stat = container.createDiv({ cls: 'bk-mini-stat' });
+		stat.createEl('span', { text: icon, cls: 'mini-stat-icon' });
+		stat.createEl('span', { text: value, cls: 'mini-stat-value' });
+		stat.createEl('span', { text: label, cls: 'mini-stat-label' });
+	}
+
+	private renderEmptyProductsState(container: HTMLElement) {
+		container.empty();
+		const emptyState = container.createDiv({ cls: 'bk-empty-state' });
+		emptyState.createEl('div', { text: '📦', cls: 'empty-state-icon' });
+		emptyState.createEl('h3', { text: 'No Products Yet' });
+		emptyState.createEl('p', { text: 'Add your first product or service to start building your catalog.' });
+		
+		const addBtn = emptyState.createEl('button', { text: '+ Add Your First Product', cls: 'bk-btn-primary' });
+		addBtn.addEventListener('click', () => {
+			const plan = this.getActivePlan();
+			if (plan) {
+				new ProductModal(this.app, this.plugin, plan, null, () => this.refresh()).open();
+			}
+		});
+	}
+
+	private filterProducts(container: HTMLElement, products: Product[], filter: string) {
+		const productsList = container.querySelector('[data-products-list]') as HTMLElement;
+		if (!productsList) return;
+		
+		const plan = this.getActivePlan();
+		if (!plan) return;
+
+		let filtered = products;
+		if (filter !== 'all') {
+			filtered = products.filter(p => p.status === filter);
+		}
+
+		productsList.empty();
+		if (filtered.length === 0) {
+			const noResults = productsList.createDiv({ cls: 'bk-no-results' });
+			noResults.createEl('p', { text: `No ${filter} products found.` });
+		} else {
+			this.renderProductCards(productsList, filtered, plan);
+		}
+	}
+
+	private renderProductCards(container: HTMLElement, products: Product[], plan: BusinessPlan) {
+		products.forEach(product => {
+			const card = container.createDiv({ cls: 'bk-product-card' });
+			
+			// Card Header
+			const cardHeader = card.createDiv({ cls: 'bk-product-card-header' });
+			
+			const categoryIcon = this.getCategoryIcon(product.category);
+			cardHeader.createEl('span', { text: categoryIcon, cls: 'product-category-icon' });
+			
+			const titleArea = cardHeader.createDiv({ cls: 'product-title-area' });
+			titleArea.createEl('h4', { text: product.name, cls: 'product-name' });
+			if (product.sku) {
+				titleArea.createEl('span', { text: `SKU: ${product.sku}`, cls: 'product-sku' });
+			}
+			
+			const statusBadge = cardHeader.createEl('span', { 
+				text: this.formatStatus(product.status),
+				cls: `product-status-badge status-${product.status}`
+			});
+
+			// Card Body
+			const cardBody = card.createDiv({ cls: 'bk-product-card-body' });
+			
+			if (product.description) {
+				cardBody.createEl('p', { text: product.description, cls: 'product-description' });
+			}
+
+			// Features preview
+			if (product.features.length > 0) {
+				const featuresPreview = cardBody.createDiv({ cls: 'product-features-preview' });
+				const displayFeatures = product.features.slice(0, 3);
+				displayFeatures.forEach(f => {
+					featuresPreview.createEl('span', { text: `✓ ${f}`, cls: 'feature-item' });
+				});
+				if (product.features.length > 3) {
+					featuresPreview.createEl('span', { 
+						text: `+${product.features.length - 3} more`,
+						cls: 'feature-more'
+					});
+				}
+			}
+
+			// Pricing summary
+			if (product.pricingTiers.length > 0) {
+				const pricingArea = cardBody.createDiv({ cls: 'product-pricing-area' });
+				pricingArea.createEl('span', { text: '💰', cls: 'pricing-icon' });
+				
+				const prices = product.pricingTiers.map(t => this.formatPrice(t.price, t.billingCycle));
+				const priceText = prices.length === 1 ? prices[0] : `From ${prices[0]}`;
+				pricingArea.createEl('span', { text: priceText, cls: 'pricing-text' });
+				
+				if (product.pricingTiers.length > 1) {
+					pricingArea.createEl('span', { 
+						text: `(${product.pricingTiers.length} tiers)`,
+						cls: 'pricing-tiers-count'
+					});
+				}
+			}
+
+			// Tags
+			if (product.tags.length > 0) {
+				const tagsArea = cardBody.createDiv({ cls: 'product-tags' });
+				product.tags.slice(0, 4).forEach(tag => {
+					tagsArea.createEl('span', { text: tag, cls: 'product-tag' });
+				});
+			}
+
+			// Card Actions
+			const cardActions = card.createDiv({ cls: 'bk-product-card-actions' });
+			
+			const editBtn = cardActions.createEl('button', { text: '✏️ Edit', cls: 'bk-btn-small' });
+			editBtn.addEventListener('click', () => {
+				new ProductModal(this.app, this.plugin, plan, product, () => this.refresh()).open();
+			});
+			
+			const duplicateBtn = cardActions.createEl('button', { text: '📋 Duplicate', cls: 'bk-btn-small bk-btn-secondary' });
+			duplicateBtn.addEventListener('click', async () => {
+				const newProduct: Product = {
+					...product,
+					id: generateId(),
+					name: `${product.name} (Copy)`,
+					sku: product.sku ? `${product.sku}-COPY` : '',
+					pricingTiers: product.pricingTiers.map(t => ({ ...t, id: generateId() }))
+				};
+				plan.products.push(newProduct);
+				plan.lastUpdated = new Date().toISOString();
+				await this.plugin.saveSettings();
+				this.refresh();
+				new Notice(`Duplicated "${product.name}"`);
+			});
+			
+			const deleteBtn = cardActions.createEl('button', { text: '🗑️', cls: 'bk-btn-icon bk-btn-danger' });
+			deleteBtn.addEventListener('click', async () => {
+				if (confirm(`Delete "${product.name}"? This cannot be undone.`)) {
+					plan.products = plan.products.filter(p => p.id !== product.id);
+					plan.lastUpdated = new Date().toISOString();
+					await this.plugin.saveSettings();
+					this.refresh();
+					new Notice(`Deleted "${product.name}"`);
+				}
+			});
+		});
+	}
+
+	private getCategoryIcon(category: Product['category']): string {
+		const icons: Record<Product['category'], string> = {
+			'wordpress': '🔷',
+			'obsidian': '💎',
+			'service': '🛠️',
+			'other': '📦'
+		};
+		return icons[category] || '📦';
+	}
+
+	private formatStatus(status: Product['status']): string {
+		const labels: Record<Product['status'], string> = {
+			'idea': '💡 Idea',
+			'development': '🔧 Development',
+			'beta': '🧪 Beta',
+			'launched': '🚀 Launched',
+			'retired': '📁 Retired'
+		};
+		return labels[status] || status;
+	}
+
+	private formatPrice(price: number, cycle: PricingTier['billingCycle']): string {
+		const formatted = new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'USD',
+			minimumFractionDigits: 0
+		}).format(price);
+		
+		const cycleLabels: Record<PricingTier['billingCycle'], string> = {
+			'one-time': '',
+			'monthly': '/mo',
+			'yearly': '/yr',
+			'lifetime': ' lifetime'
+		};
+		return `${formatted}${cycleLabels[cycle]}`;
 	}
 
 	// =========================================
@@ -1059,6 +1302,436 @@ class EditCoreValueModal extends Modal {
 			this.close();
 			this.onComplete();
 		};
+	}
+
+	onClose(): void {
+		const { contentEl } = this;
+		contentEl.empty();
+	}
+}
+
+// ===========================================
+// PRODUCT MODAL (Create/Edit)
+// ===========================================
+class ProductModal extends Modal {
+	plugin: BKBusinessPlanPlugin;
+	plan: BusinessPlan;
+	product: Product | null;
+	onComplete: () => void;
+	
+	// Form data
+	formData: Product;
+
+	constructor(
+		app: App,
+		plugin: BKBusinessPlanPlugin,
+		plan: BusinessPlan,
+		product: Product | null,
+		onComplete: () => void
+	) {
+		super(app);
+		this.plugin = plugin;
+		this.plan = plan;
+		this.product = product;
+		this.onComplete = onComplete;
+		
+		// Initialize form data
+		if (product) {
+			this.formData = { ...product, pricingTiers: [...product.pricingTiers], features: [...product.features], tags: [...product.tags] };
+		} else {
+			this.formData = {
+				id: generateId(),
+				sku: '',
+				name: '',
+				category: 'other',
+				description: '',
+				features: [],
+				pricingTiers: [],
+				status: 'idea',
+				launchDate: '',
+				tags: []
+			};
+		}
+	}
+
+	onOpen(): void {
+		const { contentEl } = this;
+		contentEl.empty();
+		contentEl.addClass('bk-product-modal');
+
+		const isEdit = this.product !== null;
+		contentEl.createEl('h2', { text: isEdit ? '✏️ Edit Product' : '➕ Add Product' });
+
+		// Basic Info Section
+		const basicSection = contentEl.createDiv({ cls: 'bk-modal-section' });
+		basicSection.createEl('h3', { text: '📋 Basic Information' });
+
+		new Setting(basicSection)
+			.setName('Product Name')
+			.setDesc('The name of your product or service')
+			.addText(text => text
+				.setPlaceholder('My Awesome Product')
+				.setValue(this.formData.name)
+				.onChange(value => this.formData.name = value)
+			);
+
+		new Setting(basicSection)
+			.setName('SKU')
+			.setDesc('Stock keeping unit (optional)')
+			.addText(text => text
+				.setPlaceholder('PRD-001')
+				.setValue(this.formData.sku)
+				.onChange(value => this.formData.sku = value)
+			);
+
+		new Setting(basicSection)
+			.setName('Category')
+			.addDropdown(dropdown => dropdown
+				.addOption('wordpress', '🔷 WordPress Plugin')
+				.addOption('obsidian', '💎 Obsidian Plugin')
+				.addOption('service', '🛠️ Service')
+				.addOption('other', '📦 Other')
+				.setValue(this.formData.category)
+				.onChange((value: Product['category']) => this.formData.category = value)
+			);
+
+		new Setting(basicSection)
+			.setName('Status')
+			.addDropdown(dropdown => dropdown
+				.addOption('idea', '💡 Idea')
+				.addOption('development', '🔧 Development')
+				.addOption('beta', '🧪 Beta')
+				.addOption('launched', '🚀 Launched')
+				.addOption('retired', '📁 Retired')
+				.setValue(this.formData.status)
+				.onChange((value: Product['status']) => this.formData.status = value)
+			);
+
+		// Description
+		const descSection = contentEl.createDiv({ cls: 'bk-modal-section' });
+		descSection.createEl('h3', { text: '📝 Description' });
+		
+		const descTextarea = descSection.createEl('textarea', {
+			cls: 'bk-modal-textarea',
+			placeholder: 'Describe your product or service...'
+		});
+		descTextarea.value = this.formData.description;
+		descTextarea.rows = 3;
+		descTextarea.addEventListener('input', () => this.formData.description = descTextarea.value);
+
+		// Features Section
+		const featuresSection = contentEl.createDiv({ cls: 'bk-modal-section' });
+		const featuresHeader = featuresSection.createDiv({ cls: 'bk-modal-section-header' });
+		featuresHeader.createEl('h3', { text: '✨ Features' });
+		
+		const addFeatureBtn = featuresHeader.createEl('button', { text: '+ Add', cls: 'bk-btn-small' });
+		addFeatureBtn.addEventListener('click', () => {
+			this.formData.features.push('');
+			this.renderFeaturesList(featuresListEl);
+		});
+		
+		const featuresListEl = featuresSection.createDiv({ cls: 'bk-modal-list' });
+		this.renderFeaturesList(featuresListEl);
+
+		// Pricing Tiers Section
+		const pricingSection = contentEl.createDiv({ cls: 'bk-modal-section' });
+		const pricingHeader = pricingSection.createDiv({ cls: 'bk-modal-section-header' });
+		pricingHeader.createEl('h3', { text: '💰 Pricing Tiers' });
+		
+		const addTierBtn = pricingHeader.createEl('button', { text: '+ Add Tier', cls: 'bk-btn-small' });
+		addTierBtn.addEventListener('click', () => {
+			new PricingTierModal(this.app, null, (tier) => {
+				this.formData.pricingTiers.push(tier);
+				this.renderPricingTiersList(pricingListEl);
+			}).open();
+		});
+		
+		const pricingListEl = pricingSection.createDiv({ cls: 'bk-modal-list' });
+		this.renderPricingTiersList(pricingListEl);
+
+		// Tags Section
+		const tagsSection = contentEl.createDiv({ cls: 'bk-modal-section' });
+		tagsSection.createEl('h3', { text: '🏷️ Tags' });
+		
+		const tagsInput = tagsSection.createEl('input', {
+			type: 'text',
+			cls: 'bk-modal-input',
+			placeholder: 'Enter tags separated by commas'
+		});
+		tagsInput.value = this.formData.tags.join(', ');
+		tagsInput.addEventListener('input', () => {
+			this.formData.tags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
+		});
+
+		// Launch Date (if launched)
+		const launchSection = contentEl.createDiv({ cls: 'bk-modal-section' });
+		new Setting(launchSection)
+			.setName('Launch Date')
+			.setDesc('When was/will this product be launched?')
+			.addText(text => text
+				.setPlaceholder('YYYY-MM-DD')
+				.setValue(this.formData.launchDate || '')
+				.onChange(value => this.formData.launchDate = value)
+			);
+
+		// Buttons
+		const buttonDiv = contentEl.createDiv({ cls: 'bkbpm-modal-buttons' });
+
+		const cancelBtn = buttonDiv.createEl('button', { text: 'Cancel' });
+		cancelBtn.onclick = () => this.close();
+
+		const saveBtn = buttonDiv.createEl('button', { 
+			text: isEdit ? 'Save Changes' : 'Add Product', 
+			cls: 'mod-cta' 
+		});
+		saveBtn.onclick = async () => {
+			if (!this.formData.name.trim()) {
+				new Notice('Please enter a product name');
+				return;
+			}
+
+			if (isEdit) {
+				// Update existing product
+				const index = this.plan.products.findIndex(p => p.id === this.formData.id);
+				if (index !== -1) {
+					this.plan.products[index] = this.formData;
+				}
+				new Notice(`Updated "${this.formData.name}"`);
+			} else {
+				// Add new product
+				this.plan.products.push(this.formData);
+				new Notice(`Added "${this.formData.name}"`);
+			}
+			
+			this.plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+			this.close();
+			this.onComplete();
+		};
+	}
+
+	private renderFeaturesList(container: HTMLElement) {
+		container.empty();
+		
+		if (this.formData.features.length === 0) {
+			container.createEl('p', { text: 'No features added yet.', cls: 'bk-empty-list-text' });
+			return;
+		}
+
+		this.formData.features.forEach((feature, index) => {
+			const item = container.createDiv({ cls: 'bk-list-item-editable' });
+			
+			const input = item.createEl('input', {
+				type: 'text',
+				cls: 'bk-list-item-input',
+				value: feature,
+				placeholder: 'Feature description...'
+			});
+			input.addEventListener('input', () => {
+				this.formData.features[index] = input.value;
+			});
+			
+			const deleteBtn = item.createEl('button', { text: '×', cls: 'bk-list-item-delete' });
+			deleteBtn.addEventListener('click', () => {
+				this.formData.features.splice(index, 1);
+				this.renderFeaturesList(container);
+			});
+		});
+	}
+
+	private renderPricingTiersList(container: HTMLElement) {
+		container.empty();
+		
+		if (this.formData.pricingTiers.length === 0) {
+			container.createEl('p', { text: 'No pricing tiers added yet.', cls: 'bk-empty-list-text' });
+			return;
+		}
+
+		this.formData.pricingTiers.forEach((tier, index) => {
+			const item = container.createDiv({ cls: 'bk-pricing-tier-item' });
+			
+			const info = item.createDiv({ cls: 'tier-info' });
+			info.createEl('span', { text: tier.name, cls: 'tier-name' });
+			
+			const priceText = this.formatTierPrice(tier);
+			info.createEl('span', { text: priceText, cls: 'tier-price' });
+			
+			if (tier.isPopular) {
+				info.createEl('span', { text: '⭐ Popular', cls: 'tier-popular' });
+			}
+			
+			const actions = item.createDiv({ cls: 'tier-actions' });
+			
+			const editBtn = actions.createEl('button', { text: '✏️', cls: 'bk-btn-icon' });
+			editBtn.addEventListener('click', () => {
+				new PricingTierModal(this.app, tier, (updatedTier) => {
+					this.formData.pricingTiers[index] = updatedTier;
+					this.renderPricingTiersList(container);
+				}).open();
+			});
+			
+			const deleteBtn = actions.createEl('button', { text: '🗑️', cls: 'bk-btn-icon bk-btn-danger' });
+			deleteBtn.addEventListener('click', () => {
+				this.formData.pricingTiers.splice(index, 1);
+				this.renderPricingTiersList(container);
+			});
+		});
+	}
+
+	private formatTierPrice(tier: PricingTier): string {
+		const price = new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'USD',
+			minimumFractionDigits: 0
+		}).format(tier.price);
+		
+		const cycles: Record<string, string> = {
+			'one-time': '',
+			'monthly': '/month',
+			'yearly': '/year',
+			'lifetime': ' (lifetime)'
+		};
+		return `${price}${cycles[tier.billingCycle] || ''}`;
+	}
+
+	onClose(): void {
+		const { contentEl } = this;
+		contentEl.empty();
+	}
+}
+
+// ===========================================
+// PRICING TIER MODAL
+// ===========================================
+class PricingTierModal extends Modal {
+	tier: PricingTier | null;
+	onSave: (tier: PricingTier) => void;
+	formData: PricingTier;
+
+	constructor(app: App, tier: PricingTier | null, onSave: (tier: PricingTier) => void) {
+		super(app);
+		this.tier = tier;
+		this.onSave = onSave;
+		
+		if (tier) {
+			this.formData = { ...tier, features: [...tier.features] };
+		} else {
+			this.formData = {
+				id: generateId(),
+				name: '',
+				price: 0,
+				billingCycle: 'one-time',
+				features: [],
+				isPopular: false
+			};
+		}
+	}
+
+	onOpen(): void {
+		const { contentEl } = this;
+		contentEl.empty();
+		contentEl.addClass('bk-tier-modal');
+
+		const isEdit = this.tier !== null;
+		contentEl.createEl('h2', { text: isEdit ? '✏️ Edit Pricing Tier' : '➕ Add Pricing Tier' });
+
+		new Setting(contentEl)
+			.setName('Tier Name')
+			.setDesc('e.g., Basic, Pro, Enterprise')
+			.addText(text => text
+				.setPlaceholder('Pro')
+				.setValue(this.formData.name)
+				.onChange(value => this.formData.name = value)
+			);
+
+		new Setting(contentEl)
+			.setName('Price')
+			.addText(text => text
+				.setPlaceholder('29')
+				.setValue(this.formData.price.toString())
+				.onChange(value => this.formData.price = parseFloat(value) || 0)
+			);
+
+		new Setting(contentEl)
+			.setName('Billing Cycle')
+			.addDropdown(dropdown => dropdown
+				.addOption('one-time', 'One-time')
+				.addOption('monthly', 'Monthly')
+				.addOption('yearly', 'Yearly')
+				.addOption('lifetime', 'Lifetime')
+				.setValue(this.formData.billingCycle)
+				.onChange((value: PricingTier['billingCycle']) => this.formData.billingCycle = value)
+			);
+
+		new Setting(contentEl)
+			.setName('Mark as Popular')
+			.setDesc('Highlight this tier as the recommended option')
+			.addToggle(toggle => toggle
+				.setValue(this.formData.isPopular || false)
+				.onChange(value => this.formData.isPopular = value)
+			);
+
+		// Tier Features
+		const featuresSection = contentEl.createDiv({ cls: 'bk-modal-section' });
+		const featuresHeader = featuresSection.createDiv({ cls: 'bk-modal-section-header' });
+		featuresHeader.createEl('h3', { text: 'Included Features' });
+		
+		const addFeatureBtn = featuresHeader.createEl('button', { text: '+ Add', cls: 'bk-btn-small' });
+		addFeatureBtn.addEventListener('click', () => {
+			this.formData.features.push('');
+			this.renderTierFeatures(featuresListEl);
+		});
+		
+		const featuresListEl = featuresSection.createDiv({ cls: 'bk-modal-list' });
+		this.renderTierFeatures(featuresListEl);
+
+		// Buttons
+		const buttonDiv = contentEl.createDiv({ cls: 'bkbpm-modal-buttons' });
+
+		const cancelBtn = buttonDiv.createEl('button', { text: 'Cancel' });
+		cancelBtn.onclick = () => this.close();
+
+		const saveBtn = buttonDiv.createEl('button', { 
+			text: isEdit ? 'Save Tier' : 'Add Tier', 
+			cls: 'mod-cta' 
+		});
+		saveBtn.onclick = () => {
+			if (!this.formData.name.trim()) {
+				new Notice('Please enter a tier name');
+				return;
+			}
+			this.onSave(this.formData);
+			this.close();
+		};
+	}
+
+	private renderTierFeatures(container: HTMLElement) {
+		container.empty();
+		
+		if (this.formData.features.length === 0) {
+			container.createEl('p', { text: 'No features added.', cls: 'bk-empty-list-text' });
+			return;
+		}
+
+		this.formData.features.forEach((feature, index) => {
+			const item = container.createDiv({ cls: 'bk-list-item-editable' });
+			
+			const input = item.createEl('input', {
+				type: 'text',
+				cls: 'bk-list-item-input',
+				value: feature,
+				placeholder: 'Feature...'
+			});
+			input.addEventListener('input', () => {
+				this.formData.features[index] = input.value;
+			});
+			
+			const deleteBtn = item.createEl('button', { text: '×', cls: 'bk-list-item-delete' });
+			deleteBtn.addEventListener('click', () => {
+				this.formData.features.splice(index, 1);
+				this.renderTierFeatures(container);
+			});
+		});
 	}
 
 	onClose(): void {
