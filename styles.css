@@ -1,0 +1,853 @@
+/* ===========================================
+   BK Business Plan Manager - Styles
+   =========================================== */
+
+/* ===========================================
+   CSS Variables
+   =========================================== */
+.bk-plan-container {
+	--bk-primary: #3498db;
+	--bk-primary-dark: #2980b9;
+	--bk-success: #27ae60;
+	--bk-warning: #f39c12;
+	--bk-danger: #e74c3c;
+	--bk-purple: #9b59b6;
+	--bk-text: var(--text-normal);
+	--bk-text-muted: var(--text-muted);
+	--bk-bg-light: var(--background-secondary);
+	--bk-border: var(--background-modifier-border);
+	--bk-radius: 8px;
+	--bk-radius-lg: 12px;
+	--bk-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===========================================
+   Main Container
+   =========================================== */
+.bk-plan-container {
+	padding: 0;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+}
+
+/* ===========================================
+   Header
+   =========================================== */
+.bk-plan-header {
+	padding: 20px 24px;
+	background: linear-gradient(135deg, #3498db, #2980b9);
+	color: white;
+	text-align: center;
+}
+
+.bk-plan-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.bk-plan-header h1 {
+	margin: 0;
+	font-size: 1.5em;
+	font-weight: 700;
+	color: white;
+}
+
+.bk-business-name-badge {
+	background: rgba(255, 255, 255, 0.25);
+	padding: 4px 12px;
+	border-radius: 20px;
+	font-size: 0.85em;
+	font-weight: 600;
+}
+
+.bk-plan-subtitle {
+	margin: 8px 0 0 0;
+	opacity: 0.9;
+	font-size: 0.95em;
+}
+
+/* ===========================================
+   Navigation
+   =========================================== */
+.bk-plan-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 12px 16px;
+	background: var(--background-secondary);
+	border-bottom: 1px solid var(--bk-border);
+	justify-content: center;
+}
+
+.bk-nav-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 12px;
+	border: none;
+	background: transparent;
+	border-radius: var(--bk-radius);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	font-size: 0.85em;
+	color: var(--bk-text-muted);
+}
+
+.bk-nav-btn:hover {
+	background: rgba(52, 152, 219, 0.1);
+	color: var(--bk-primary);
+}
+
+.bk-nav-btn.active {
+	background: linear-gradient(135deg, #3498db, #2980b9);
+	color: white;
+	box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.bk-nav-btn .nav-icon {
+	font-size: 1.1em;
+}
+
+.bk-nav-btn .nav-label {
+	font-weight: 500;
+}
+
+/* ===========================================
+   Content Area
+   =========================================== */
+.bk-plan-content {
+	flex: 1;
+	padding: 20px 24px;
+	overflow-y: auto;
+}
+
+/* ===========================================
+   Sections
+   =========================================== */
+.bk-section {
+	margin-bottom: 24px;
+}
+
+.bk-section h2 {
+	margin: 0 0 16px 0;
+	font-size: 1.3em;
+	color: var(--bk-text);
+	border-bottom: 2px solid var(--bk-primary);
+	padding-bottom: 8px;
+}
+
+.bk-section h3 {
+	margin: 0 0 12px 0;
+	font-size: 1.1em;
+	color: var(--bk-text);
+}
+
+/* ===========================================
+   Welcome Section
+   =========================================== */
+.bk-welcome-section {
+	background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+	border-radius: var(--bk-radius-lg);
+	padding: 20px 24px;
+	text-align: center;
+}
+
+.theme-dark .bk-welcome-section {
+	background: linear-gradient(135deg, #2c3e50, #34495e);
+}
+
+.bk-welcome-section h2 {
+	border: none;
+	padding: 0;
+	margin-bottom: 12px;
+}
+
+.bk-mission-text {
+	font-style: italic;
+	color: var(--bk-text-muted);
+	line-height: 1.6;
+	margin: 0;
+}
+
+/* ===========================================
+   Stats Grid
+   =========================================== */
+.bk-stats-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+.bk-stat-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	padding: 20px 16px;
+	background: var(--background-primary);
+	border: 1px solid var(--bk-border);
+	border-radius: var(--bk-radius-lg);
+	box-shadow: var(--bk-shadow);
+	transition: transform 0.2s ease;
+}
+
+.bk-stat-card:hover {
+	transform: translateY(-3px);
+}
+
+.bk-stat-card .stat-icon {
+	font-size: 1.8em;
+}
+
+.bk-stat-card .stat-value {
+	font-size: 1.5em;
+	font-weight: 700;
+	color: var(--bk-primary);
+}
+
+.bk-stat-card .stat-label {
+	font-size: 0.85em;
+	color: var(--bk-text-muted);
+	text-align: center;
+}
+
+/* ===========================================
+   Quick Actions
+   =========================================== */
+.bk-actions-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 12px;
+}
+
+.bk-action-btn {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 16px;
+	border: 2px solid var(--bk-border);
+	border-radius: var(--bk-radius);
+	background: var(--background-primary);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.bk-action-btn:hover {
+	border-color: var(--bk-primary);
+	background: rgba(52, 152, 219, 0.08);
+	transform: translateY(-2px);
+}
+
+.bk-action-btn .action-icon {
+	font-size: 1.5em;
+}
+
+.bk-action-btn .action-label {
+	font-size: 0.9em;
+	font-weight: 500;
+	color: var(--bk-text);
+}
+
+/* ===========================================
+   Milestones List
+   =========================================== */
+.bk-milestones-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.bk-milestone-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+	background: var(--background-primary);
+	border: 1px solid var(--bk-border);
+	border-radius: var(--bk-radius);
+	transition: all 0.2s ease;
+}
+
+.bk-milestone-item:hover {
+	border-color: var(--bk-primary);
+}
+
+.bk-milestone-item.completed {
+	border-left: 3px solid var(--bk-success);
+}
+
+.bk-milestone-item.in-progress {
+	border-left: 3px solid var(--bk-warning);
+}
+
+.bk-milestone-item.delayed {
+	border-left: 3px solid var(--bk-danger);
+}
+
+.bk-milestone-item .milestone-status {
+	font-size: 1.2em;
+}
+
+.bk-milestone-item .milestone-title {
+	flex: 1;
+	font-weight: 500;
+}
+
+.bk-milestone-item .milestone-date {
+	font-size: 0.85em;
+	color: var(--bk-text-muted);
+}
+
+/* ===========================================
+   Products Overview
+   =========================================== */
+.bk-products-overview {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.bk-product-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+	background: var(--background-primary);
+	border: 1px solid var(--bk-border);
+	border-radius: var(--bk-radius);
+}
+
+.bk-product-item .product-category {
+	font-size: 1.2em;
+}
+
+.bk-product-item .product-name {
+	flex: 1;
+	font-weight: 500;
+}
+
+.bk-product-item .product-status {
+	font-size: 0.75em;
+	padding: 4px 10px;
+	border-radius: 12px;
+	font-weight: 500;
+	text-transform: capitalize;
+}
+
+.bk-product-item .product-status.launched {
+	background: rgba(39, 174, 96, 0.15);
+	color: var(--bk-success);
+}
+
+.bk-product-item .product-status.development {
+	background: rgba(52, 152, 219, 0.15);
+	color: var(--bk-primary);
+}
+
+.bk-product-item .product-status.beta {
+	background: rgba(243, 156, 18, 0.15);
+	color: var(--bk-warning);
+}
+
+.bk-product-item .product-status.idea {
+	background: rgba(155, 89, 182, 0.15);
+	color: var(--bk-purple);
+}
+
+.bk-product-item .product-status.retired {
+	background: rgba(127, 140, 141, 0.15);
+	color: var(--bk-text-muted);
+}
+
+/* ===========================================
+   Footer
+   =========================================== */
+.bk-dashboard-footer {
+	text-align: center;
+	padding: 16px;
+	border-top: 1px solid var(--bk-border);
+	margin-top: 20px;
+}
+
+.bk-last-updated {
+	font-size: 0.85em;
+	color: var(--bk-text-muted);
+}
+
+/* ===========================================
+   Coming Soon Placeholder
+   =========================================== */
+.bk-coming-soon {
+	padding: 40px 20px;
+	text-align: center;
+	color: var(--bk-text-muted);
+	font-style: italic;
+	background: var(--background-secondary);
+	border-radius: var(--bk-radius-lg);
+	border: 2px dashed var(--bk-border);
+}
+
+/* ===========================================
+   Settings Styles
+   =========================================== */
+.bk-plan-container textarea {
+	min-height: 80px;
+	resize: vertical;
+}
+
+/* ===========================================
+   Responsive
+   =========================================== */
+@media (max-width: 600px) {
+	.bk-plan-header {
+		padding: 16px;
+	}
+	
+	.bk-plan-header h1 {
+		font-size: 1.3em;
+	}
+	
+	.bk-nav-btn .nav-label {
+		display: none;
+	}
+	
+	.bk-nav-btn {
+		padding: 10px 12px;
+	}
+	
+	.bk-nav-btn .nav-icon {
+		font-size: 1.3em;
+	}
+	
+	.bk-plan-content {
+		padding: 16px;
+	}
+	
+	.bk-stats-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* ===========================================
+   Plan Selector
+   =========================================== */
+.bk-plan-selector {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.bk-plan-dropdown {
+	padding: 6px 12px;
+	border-radius: 20px;
+	border: none;
+	background: rgba(255, 255, 255, 0.25);
+	color: white;
+	font-size: 0.9em;
+	font-weight: 500;
+	cursor: pointer;
+	min-width: 150px;
+}
+
+.bk-plan-dropdown option {
+	background: var(--background-primary);
+	color: var(--text-normal);
+}
+
+.bk-new-plan-btn {
+	padding: 6px 12px;
+	border-radius: 20px;
+	border: 2px solid rgba(255, 255, 255, 0.5);
+	background: transparent;
+	color: white;
+	font-size: 0.85em;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.bk-new-plan-btn:hover {
+	background: rgba(255, 255, 255, 0.2);
+	border-color: white;
+}
+
+/* ===========================================
+   Empty State (No Plans)
+   =========================================== */
+.bk-empty-state {
+	padding: 40px 24px;
+	text-align: center;
+}
+
+.bk-empty-icon {
+	font-size: 4em;
+	margin-bottom: 16px;
+}
+
+.bk-empty-state h2 {
+	margin: 0 0 8px 0;
+	color: var(--bk-text);
+}
+
+.bk-empty-state p {
+	color: var(--bk-text-muted);
+	margin-bottom: 32px;
+}
+
+/* ===========================================
+   Template Grid
+   =========================================== */
+.bk-template-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 16px;
+	max-width: 700px;
+	margin: 0 auto;
+}
+
+.bk-template-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 24px 16px;
+	background: var(--background-primary);
+	border: 2px solid var(--bk-border);
+	border-radius: var(--bk-radius-lg);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.bk-template-card:hover {
+	border-color: var(--bk-primary);
+	transform: translateY(-4px);
+	box-shadow: var(--bk-shadow);
+}
+
+.bk-template-card .template-icon {
+	font-size: 2.5em;
+}
+
+.bk-template-card .template-name {
+	font-weight: 600;
+	color: var(--bk-text);
+}
+
+.bk-template-card .template-desc {
+	font-size: 0.8em;
+	color: var(--bk-text-muted);
+	text-align: center;
+}
+
+/* ===========================================
+   Plan Name Input Modal
+   =========================================== */
+.bk-plan-name-input {
+	width: 100%;
+	padding: 10px 12px !important;
+	border: 2px solid var(--bk-border) !important;
+	border-radius: var(--bk-radius) !important;
+	font-size: 1em;
+	margin-bottom: 16px;
+}
+
+.bk-plan-name-input:focus {
+	border-color: var(--bk-primary) !important;
+	outline: none;
+}
+
+.bk-modal-buttons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+	margin-top: 20px;
+}
+
+.bk-modal-buttons button {
+	padding: 8px 20px;
+	border-radius: var(--bk-radius);
+	font-weight: 500;
+	cursor: pointer;
+}
+
+/* ===========================================
+   Create Plan Card
+   =========================================== */
+.bk-create-plan-card {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 24px;
+	margin-bottom: 24px;
+	background: var(--background-secondary);
+	border: 3px dashed var(--bk-primary);
+	border-radius: var(--bk-radius-lg);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.bk-create-plan-card:hover {
+	background: rgba(52, 152, 219, 0.1);
+	border-style: solid;
+}
+
+.bk-create-plan-card .create-icon {
+	font-size: 2em;
+	color: var(--bk-primary);
+	font-weight: 300;
+}
+
+.bk-create-plan-card .create-text {
+	font-size: 1.1em;
+	font-weight: 600;
+	color: var(--bk-primary);
+}
+
+/* ===========================================
+   Plans Grid
+   =========================================== */
+.bk-plans-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 20px;
+}
+
+.bk-plan-card {
+	background: var(--background-primary);
+	border: 2px solid var(--bk-border);
+	border-radius: var(--bk-radius-lg);
+	overflow: hidden;
+	transition: all 0.2s ease;
+}
+
+.bk-plan-card:hover {
+	box-shadow: var(--bk-shadow);
+	transform: translateY(-2px);
+}
+
+.bk-plan-card.is-active {
+	border-color: var(--bk-primary);
+	box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Plan Card Header */
+.plan-card-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 16px;
+	background: var(--background-secondary);
+	border-bottom: 1px solid var(--bk-border);
+}
+
+.plan-card-icon {
+	font-size: 1.5em;
+}
+
+.plan-card-name {
+	flex: 1;
+	font-size: 1.1em;
+	font-weight: 600;
+	color: var(--bk-text);
+}
+
+.plan-card-active {
+	color: var(--bk-success);
+	font-weight: 700;
+}
+
+/* Plan Card Info */
+.plan-card-info {
+	padding: 16px;
+}
+
+.plan-card-desc {
+	margin: 0 0 12px 0;
+	color: var(--bk-text-muted);
+	font-size: 0.9em;
+	line-height: 1.5;
+}
+
+.plan-card-stats {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 12px;
+	font-size: 0.85em;
+	color: var(--bk-text-muted);
+}
+
+.plan-card-date {
+	font-size: 0.8em;
+	color: var(--bk-text-muted);
+}
+
+/* Plan Card Actions */
+.plan-card-actions {
+	display: flex;
+	gap: 8px;
+	padding: 12px 16px;
+	border-top: 1px solid var(--bk-border);
+	background: var(--background-secondary);
+}
+
+.plan-card-actions button {
+	padding: 8px 16px;
+	border-radius: var(--bk-radius);
+	font-size: 0.9em;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.plan-card-actions button.mod-cta {
+	flex: 1;
+}
+
+.plan-delete-btn {
+	background: transparent !important;
+	border: 1px solid var(--bk-border) !important;
+	color: var(--bk-text-muted) !important;
+}
+
+.plan-delete-btn:hover {
+	background: rgba(231, 76, 60, 0.1) !important;
+	border-color: var(--bk-danger) !important;
+	color: var(--bk-danger) !important;
+}
+
+/* ===========================================
+   Settings Plan List
+   =========================================== */
+.bkbpm-plan-list-container {
+	margin-bottom: 20px;
+}
+
+.bkbpm-plan-list-empty {
+	padding: 20px;
+	text-align: center;
+	color: var(--bk-text-muted);
+	background: var(--background-secondary);
+	border-radius: var(--bk-radius);
+}
+
+.bkbpm-plan-list-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	margin-bottom: 8px;
+	background: var(--background-primary);
+	border: 1px solid var(--bk-border);
+	border-radius: var(--bk-radius);
+}
+
+.bkbpm-plan-list-item.is-active {
+	border-color: var(--bk-primary);
+	background: rgba(52, 152, 219, 0.05);
+}
+
+.bkbpm-plan-list-info {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.bkbpm-plan-icon {
+	font-size: 1.3em;
+}
+
+.bkbpm-plan-name {
+	font-weight: 600;
+	color: var(--bk-text);
+}
+
+.bkbpm-plan-active-badge {
+	font-size: 0.8em;
+	color: var(--bk-success);
+	font-weight: 500;
+}
+
+.bkbpm-plan-list-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.bkbpm-plan-list-actions button {
+	padding: 6px 12px;
+	font-size: 0.85em;
+	border-radius: var(--bk-radius);
+	cursor: pointer;
+}
+
+.bkbpm-delete-btn {
+	background: transparent !important;
+	border: none !important;
+}
+
+.bkbpm-delete-btn:hover {
+	color: var(--bk-danger) !important;
+}
+
+/* ===========================================
+   Settings Modal
+   =========================================== */
+.bkbpm-create-plan-modal,
+.bkbpm-edit-plan-modal {
+	padding: 20px;
+}
+
+.bkbpm-create-plan-modal h2,
+.bkbpm-edit-plan-modal h2 {
+	margin: 0 0 20px 0;
+}
+
+.bkbpm-modal-buttons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+	margin-top: 24px;
+}
+
+.bkbpm-modal-buttons button {
+	padding: 10px 20px;
+	border-radius: var(--bk-radius);
+	font-weight: 500;
+	cursor: pointer;
+}
+
+/* ===========================================
+   About Section
+   =========================================== */
+.bkbpm-about {
+	padding: 16px;
+	background: var(--background-secondary);
+	border-radius: var(--bk-radius);
+}
+
+.bkbpm-about p {
+	margin: 0 0 8px 0;
+	color: var(--bk-text-muted);
+}
+
+.bkbpm-about-stat {
+	font-weight: 600;
+	color: var(--bk-primary);
+}
+
+/* ===========================================
+   No Plan Message
+   =========================================== */
+.bk-no-plan {
+	text-align: center;
+	padding: 40px;
+	color: var(--bk-text-muted);
+	font-style: italic;
+}

@@ -1,0 +1,239 @@
+{
+  "plans": [
+    {
+      "id": "mj787kimct1d0520jab",
+      "name": "Greater Life",
+      "description": "",
+      "icon": "🔌",
+      "color": "#9b59b6",
+      "createdAt": "2025-12-15T14:05:27.838Z",
+      "lastUpdated": "2025-12-15T14:05:27.838Z",
+      "executive": {
+        "businessName": "Greater Life",
+        "tagline": "",
+        "mission": "Empower users with powerful, easy-to-use plugins.",
+        "vision": "",
+        "coreValues": [
+          "User-First Design",
+          "Quality & Reliability",
+          "Continuous Improvement"
+        ],
+        "targetMarket": "",
+        "uniqueValue": "",
+        "foundedDate": "",
+        "founder": ""
+      },
+      "products": [],
+      "bundles": [],
+      "market": {
+        "marketSize": "",
+        "growthRate": "",
+        "trends": [],
+        "targetSegments": [
+          "Small Businesses",
+          "Productivity Enthusiasts",
+          "Knowledge Workers"
+        ],
+        "competitors": [],
+        "differentiators": [
+          "Superior documentation",
+          "Regular updates",
+          "Excellent support"
+        ],
+        "opportunities": [],
+        "threats": []
+      },
+      "marketing": {
+        "websiteUrl": "",
+        "channels": [],
+        "funnel": {
+          "awareness": [
+            "Content marketing",
+            "Plugin directories",
+            "Social media"
+          ],
+          "interest": [
+            "Free trial/lite versions",
+            "Documentation",
+            "Demo videos"
+          ],
+          "consideration": [
+            "Comparison guides",
+            "Testimonials",
+            "Feature highlights"
+          ],
+          "conversion": [
+            "Promotional discounts",
+            "Bundle deals"
+          ],
+          "retention": [
+            "Email updates",
+            "New features",
+            "Community engagement"
+          ]
+        },
+        "pricingStrategy": "",
+        "promotions": [],
+        "partnerships": []
+      },
+      "operations": {
+        "developmentProcess": "",
+        "releaseSchedule": "",
+        "supportChannels": [],
+        "distributionMethod": "",
+        "processes": [],
+        "tools": []
+      },
+      "technology": {
+        "stack": [],
+        "licensingSystem": "",
+        "paymentProcessors": [
+          "Stripe",
+          "PayPal"
+        ],
+        "analyticsTools": []
+      },
+      "financial": {
+        "revenueStreams": [],
+        "expenses": [],
+        "projections": [],
+        "startupCosts": 0,
+        "breakEvenPoint": "",
+        "fundingNeeds": ""
+      },
+      "legal": {
+        "businessStructure": "",
+        "licensingModel": "GPL for PHP, commercial EULA for JS/assets",
+        "documents": [],
+        "complianceNotes": []
+      },
+      "roadmap": {
+        "milestones": [],
+        "quarterlyGoals": {},
+        "longTermVision": ""
+      }
+    }
+  ],
+  "activePlanId": "mj787kimct1d0520jab",
+  "showSidebar": true,
+  "autoSave": true,
+  "exportFormat": "json",
+  "plan": {
+    "executive": {
+      "businessName": "Greater Life",
+      "tagline": "Tools for a Better Life",
+      "mission": "Empower humanity to develop habits for a better quality of life through powerful, easy-to-use WordPress and Obsidian.md plugins.",
+      "vision": "A world where technology helps people live healthier, more organized, and more intentional lives.",
+      "coreValues": [
+        "User-First Design",
+        "Quality & Reliability",
+        "Continuous Improvement",
+        "Community Focus",
+        "Healthy Living"
+      ],
+      "targetMarket": "Churches, non-profits, small businesses, and productivity enthusiasts seeking tools for better habits and organization.",
+      "uniqueValue": "Integrated suite of plugins focused on wellness, productivity, and community - with superior support and regular updates.",
+      "foundedDate": "1992-01-01",
+      "founder": "Dr. William A. King, Jr."
+    },
+    "products": [],
+    "bundles": [],
+    "market": {
+      "marketSize": "",
+      "growthRate": "",
+      "trends": [],
+      "targetSegments": [
+        "Churches & Religious Organizations",
+        "Non-profits",
+        "Small Businesses",
+        "Productivity Enthusiasts",
+        "Knowledge Workers"
+      ],
+      "competitors": [],
+      "differentiators": [
+        "Focus on healthy habits and wellness",
+        "Integrated plugin ecosystem",
+        "Community-centered approach",
+        "Superior documentation and support",
+        "Regular updates and improvements"
+      ],
+      "opportunities": [],
+      "threats": []
+    },
+    "marketing": {
+      "websiteUrl": "",
+      "channels": [],
+      "funnel": {
+        "awareness": [
+          "Content marketing",
+          "Plugin directories",
+          "Social media"
+        ],
+        "interest": [
+          "Free trial/lite versions",
+          "Documentation",
+          "Demo videos"
+        ],
+        "consideration": [
+          "Comparison guides",
+          "Testimonials",
+          "Feature highlights"
+        ],
+        "conversion": [
+          "Promotional discounts",
+          "Bundle deals",
+          "Non-profit pricing"
+        ],
+        "retention": [
+          "Email updates",
+          "New features",
+          "Community engagement"
+        ]
+      },
+      "pricingStrategy": "Competitive pricing with special discounts for non-profits and churches. Tiered pricing for single-site, multi-site, and lifetime licenses.",
+      "promotions": [],
+      "partnerships": []
+    },
+    "operations": {
+      "developmentProcess": "",
+      "releaseSchedule": "",
+      "supportChannels": [
+        "Email",
+        "Knowledge Base",
+        "Documentation"
+      ],
+      "distributionMethod": "Secure customer portal with license key system",
+      "processes": [],
+      "tools": []
+    },
+    "technology": {
+      "stack": [],
+      "licensingSystem": "",
+      "paymentProcessors": [
+        "Stripe",
+        "PayPal"
+      ],
+      "analyticsTools": []
+    },
+    "financial": {
+      "revenueStreams": [],
+      "expenses": [],
+      "projections": [],
+      "startupCosts": 0,
+      "breakEvenPoint": "",
+      "fundingNeeds": ""
+    },
+    "legal": {
+      "businessStructure": "",
+      "licensingModel": "GPL for WordPress PHP code, commercial EULA for JavaScript/assets and Obsidian plugins",
+      "documents": [],
+      "complianceNotes": []
+    },
+    "roadmap": {
+      "milestones": [],
+      "quarterlyGoals": {},
+      "longTermVision": ""
+    },
+    "lastUpdated": "2025-12-15T13:52:48.050Z"
+  }
+}
