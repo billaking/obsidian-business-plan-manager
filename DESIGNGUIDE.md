@@ -138,11 +138,25 @@ h3 { font-size: 1.1em; }    /* Subsection titles */
 
 ### Text Styles
 
-- **Headers**: Bold (700), normal color
+- **H1 Headers**: Bold (700), white color (in gradient header)
+- **H2 Section Headers**: Bold (700), normal color, with bottom border accent
+- **H3 Subsection Headers**: Normal (400), normal color
 - **Labels**: Medium (500), muted color
 - **Body**: Normal (400), normal color
 - **Descriptions**: Normal (400), muted color, italic optional
 - **Stats**: Bold (700), primary color
+
+### Section Header Pattern
+
+```css
+.bk-section h2 {
+    margin: 0 0 16px 0;
+    color: var(--bk-text);
+    font-weight: 700;  /* Bold for emphasis */
+    border-bottom: 2px solid var(--bk-primary);  /* Blue accent line */
+    padding-bottom: 8px;
+}
+```
 
 ---
 
@@ -335,22 +349,28 @@ h3 { font-size: 1.1em; }    /* Subsection titles */
 
 ```css
 .bk-action-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 16px;
-    border: 2px solid var(--bk-border);
-    border-radius: var(--bk-radius);
-    background: var(--background-primary);
+    padding: 8px;
+    margin: 8px 24px 24px 24px;
+    background: var(--background-modifier-hover);
+    border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .bk-action-btn:hover {
     border-color: var(--bk-primary);
     background: rgba(52, 152, 219, 0.08);
     transform: translateY(-2px);
+}
+
+.bk-action-btn .action-icon {
+    font-size: 1.5em;
+}
+
+.bk-action-btn .action-label {
+    font-size: 0.9em;
+    font-weight: 500;
+    color: var(--bk-text);
 }
 ```
 
@@ -361,6 +381,8 @@ h3 { font-size: 1.1em; }    /* Subsection titles */
     <span class="action-label">Add Product</span>
 </button>
 ```
+
+> **Note**: Action buttons use a simplified flat design with hover background, making them less visually heavy while maintaining clear clickable affordance.
 
 ### 5. List Item
 

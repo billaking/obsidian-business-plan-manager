@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2024-12-15
 
+### Changed
+
+#### Styling Improvements
+- **H2 Section Headers**: Added `font-weight: 700` for bolder, more prominent section titles with blue bottom border accent
+- **Action Buttons**: Simplified design using flat background (`background-modifier-hover`) instead of bordered card style, with adjusted padding and margins for better visual balance
+
 ### Added
 
 #### Multi-Plan Architecture
