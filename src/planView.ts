@@ -502,14 +502,287 @@ export class BusinessPlanView extends ItemView {
 	}
 
 	// =========================================
-	// EXECUTIVE SUMMARY (Placeholder)
+	// EXECUTIVE SUMMARY
 	// =========================================
 	private renderExecutive(container: HTMLElement) {
-		const section = container.createDiv({ cls: 'bk-section' });
-		section.createEl('h2', { text: '🎯 Executive Summary' });
-		section.createEl('p', { 
-			text: 'Coming in Phase 2: Mission, vision, values, and business overview.',
-			cls: 'bk-coming-soon'
+		const plan = this.getActivePlan();
+		if (!plan) {
+			container.createEl('p', { text: 'No plan selected', cls: 'bk-no-plan' });
+			return;
+		}
+
+		const exec = plan.executive;
+
+		// Header
+		const header = container.createDiv({ cls: 'bk-section' });
+		header.createEl('h2', { text: '🎯 Executive Summary' });
+
+		// Business Info Card
+		const businessCard = container.createDiv({ cls: 'bk-exec-card' });
+		businessCard.createEl('h3', { text: '🏢 Business Information' });
+
+		const businessInfo = businessCard.createDiv({ cls: 'bk-exec-info-grid' });
+
+		// Business Name
+		this.renderEditableField(businessInfo, 'Business Name', exec.businessName, async (value) => {
+			plan.executive.businessName = value;
+			plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+		});
+
+		// Tagline
+		this.renderEditableField(businessInfo, 'Tagline', exec.tagline, async (value) => {
+			plan.executive.tagline = value;
+			plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+		}, 'A catchy phrase that describes your business');
+
+		// Founder
+		this.renderEditableField(businessInfo, 'Founder', exec.founder, async (value) => {
+			plan.executive.founder = value;
+			plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+		});
+
+		// Founded Date
+		this.renderEditableField(businessInfo, 'Founded', exec.foundedDate, async (value) => {
+			plan.executive.foundedDate = value;
+			plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+		}, 'e.g., January 2024');
+
+		// Mission & Vision Card
+		const missionVisionCard = container.createDiv({ cls: 'bk-exec-card' });
+		missionVisionCard.createEl('h3', { text: '🎯 Mission & Vision' });
+
+		// Mission Statement
+		this.renderEditableTextArea(missionVisionCard, 'Mission Statement', exec.mission, async (value) => {
+			plan.executive.mission = value;
+			plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+		}, 'What your business does and why it exists');
+
+		// Vision Statement
+		this.renderEditableTextArea(missionVisionCard, 'Vision Statement', exec.vision, async (value) => {
+			plan.executive.vision = value;
+			plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+		}, 'Where you want your business to be in 5-10 years');
+
+		// Core Values Card
+		const valuesCard = container.createDiv({ cls: 'bk-exec-card' });
+		const valuesHeader = valuesCard.createDiv({ cls: 'bk-exec-card-header' });
+		valuesHeader.createEl('h3', { text: '💎 Core Values' });
+		
+		const addValueBtn = valuesHeader.createEl('button', { text: '+ Add Value', cls: 'bk-btn-small' });
+		addValueBtn.addEventListener('click', () => {
+			new EditCoreValueModal(this.app, this.plugin, plan, null, () => this.refresh()).open();
+		});
+
+		const valuesContainer = valuesCard.createDiv({ cls: 'bk-values-list' });
+
+		if (exec.coreValues.length === 0) {
+			valuesContainer.createEl('p', { 
+				text: 'No core values defined yet. Click "Add Value" to create your first core value.',
+				cls: 'bk-empty-state-text'
+			});
+		} else {
+			exec.coreValues.forEach((value, index) => {
+				const valueItem = valuesContainer.createDiv({ cls: 'bk-value-item' });
+				
+				const dragHandle = valueItem.createEl('span', { text: '☰', cls: 'bk-value-drag' });
+				dragHandle.title = 'Drag to reorder';
+				
+				valueItem.createEl('span', { text: value, cls: 'bk-value-text' });
+				
+				const actions = valueItem.createDiv({ cls: 'bk-value-actions' });
+				
+				// Move Up
+				if (index > 0) {
+					const upBtn = actions.createEl('button', { text: '↑', cls: 'bk-btn-icon' });
+					upBtn.title = 'Move up';
+					upBtn.addEventListener('click', async () => {
+						const values = [...plan.executive.coreValues];
+						[values[index - 1], values[index]] = [values[index], values[index - 1]];
+						plan.executive.coreValues = values;
+						plan.lastUpdated = new Date().toISOString();
+						await this.plugin.saveSettings();
+						this.refresh();
+					});
+				}
+				
+				// Move Down
+				if (index < exec.coreValues.length - 1) {
+					const downBtn = actions.createEl('button', { text: '↓', cls: 'bk-btn-icon' });
+					downBtn.title = 'Move down';
+					downBtn.addEventListener('click', async () => {
+						const values = [...plan.executive.coreValues];
+						[values[index], values[index + 1]] = [values[index + 1], values[index]];
+						plan.executive.coreValues = values;
+						plan.lastUpdated = new Date().toISOString();
+						await this.plugin.saveSettings();
+						this.refresh();
+					});
+				}
+				
+				// Edit
+				const editBtn = actions.createEl('button', { text: '✏️', cls: 'bk-btn-icon' });
+				editBtn.title = 'Edit';
+				editBtn.addEventListener('click', () => {
+					new EditCoreValueModal(this.app, this.plugin, plan, index, () => this.refresh()).open();
+				});
+				
+				// Delete
+				const deleteBtn = actions.createEl('button', { text: '🗑️', cls: 'bk-btn-icon bk-btn-danger' });
+				deleteBtn.title = 'Delete';
+				deleteBtn.addEventListener('click', async () => {
+					if (confirm(`Delete "${value}"?`)) {
+						plan.executive.coreValues.splice(index, 1);
+						plan.lastUpdated = new Date().toISOString();
+						await this.plugin.saveSettings();
+						this.refresh();
+						new Notice('Core value deleted');
+					}
+				});
+			});
+		}
+
+		// Target Market & Value Proposition Card
+		const marketCard = container.createDiv({ cls: 'bk-exec-card' });
+		marketCard.createEl('h3', { text: '🎯 Market & Value' });
+
+		// Target Market
+		this.renderEditableTextArea(marketCard, 'Target Market', exec.targetMarket, async (value) => {
+			plan.executive.targetMarket = value;
+			plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+		}, 'Who are your ideal customers?');
+
+		// Unique Value Proposition
+		this.renderEditableTextArea(marketCard, 'Unique Value Proposition', exec.uniqueValue, async (value) => {
+			plan.executive.uniqueValue = value;
+			plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
+		}, 'What makes your business different from competitors?');
+
+		// Summary Preview Card
+		const previewCard = container.createDiv({ cls: 'bk-exec-card bk-exec-preview' });
+		previewCard.createEl('h3', { text: '📋 Summary Preview' });
+		
+		const previewContent = previewCard.createDiv({ cls: 'bk-preview-content' });
+		
+		if (exec.businessName) {
+			previewContent.createEl('h4', { text: exec.businessName });
+		}
+		if (exec.tagline) {
+			previewContent.createEl('p', { text: exec.tagline, cls: 'bk-preview-tagline' });
+		}
+		if (exec.mission) {
+			const missionP = previewContent.createDiv({ cls: 'bk-preview-section' });
+			missionP.createEl('strong', { text: 'Mission: ' });
+			missionP.createEl('span', { text: exec.mission });
+		}
+		if (exec.vision) {
+			const visionP = previewContent.createDiv({ cls: 'bk-preview-section' });
+			visionP.createEl('strong', { text: 'Vision: ' });
+			visionP.createEl('span', { text: exec.vision });
+		}
+		if (exec.coreValues.length > 0) {
+			const valuesP = previewContent.createDiv({ cls: 'bk-preview-section' });
+			valuesP.createEl('strong', { text: 'Core Values: ' });
+			valuesP.createEl('span', { text: exec.coreValues.join(' • ') });
+		}
+
+		// Completion indicator
+		const completionScore = this.calculateExecutiveCompletion(exec);
+		const completionDiv = container.createDiv({ cls: 'bk-completion-indicator' });
+		completionDiv.createEl('span', { text: `Section Completion: ${completionScore}%`, cls: 'bk-completion-text' });
+		const progressBar = completionDiv.createDiv({ cls: 'bk-progress-bar' });
+		const progressFill = progressBar.createDiv({ cls: 'bk-progress-fill' });
+		progressFill.style.width = `${completionScore}%`;
+	}
+
+	// Helper: Calculate executive summary completion
+	private calculateExecutiveCompletion(exec: any): number {
+		const fields = [
+			exec.businessName,
+			exec.tagline,
+			exec.mission,
+			exec.vision,
+			exec.founder,
+			exec.foundedDate,
+			exec.targetMarket,
+			exec.uniqueValue,
+			exec.coreValues.length > 0
+		];
+		const filled = fields.filter(f => f).length;
+		return Math.round((filled / fields.length) * 100);
+	}
+
+	// Helper: Render editable single-line field
+	private renderEditableField(
+		container: HTMLElement,
+		label: string,
+		value: string,
+		onSave: (value: string) => Promise<void>,
+		placeholder?: string
+	) {
+		const fieldDiv = container.createDiv({ cls: 'bk-exec-field' });
+		
+		const labelEl = fieldDiv.createEl('label', { text: label, cls: 'bk-field-label' });
+		
+		const inputWrapper = fieldDiv.createDiv({ cls: 'bk-input-wrapper' });
+		const input = inputWrapper.createEl('input', {
+			type: 'text',
+			cls: 'bk-field-input',
+			value: value,
+			placeholder: placeholder || `Enter ${label.toLowerCase()}...`
+		});
+		
+		let saveTimeout: NodeJS.Timeout;
+		input.addEventListener('input', () => {
+			clearTimeout(saveTimeout);
+			saveTimeout = setTimeout(async () => {
+				await onSave(input.value);
+			}, 500);
+		});
+		
+		input.addEventListener('blur', async () => {
+			clearTimeout(saveTimeout);
+			await onSave(input.value);
+		});
+	}
+
+	// Helper: Render editable textarea field
+	private renderEditableTextArea(
+		container: HTMLElement,
+		label: string,
+		value: string,
+		onSave: (value: string) => Promise<void>,
+		placeholder?: string
+	) {
+		const fieldDiv = container.createDiv({ cls: 'bk-exec-field bk-exec-field-textarea' });
+		
+		fieldDiv.createEl('label', { text: label, cls: 'bk-field-label' });
+		
+		const textarea = fieldDiv.createEl('textarea', {
+			cls: 'bk-field-textarea',
+			text: value,
+			placeholder: placeholder || `Enter ${label.toLowerCase()}...`
+		});
+		textarea.rows = 3;
+		
+		let saveTimeout: NodeJS.Timeout;
+		textarea.addEventListener('input', () => {
+			clearTimeout(saveTimeout);
+			saveTimeout = setTimeout(async () => {
+				await onSave(textarea.value);
+			}, 500);
+		});
+		
+		textarea.addEventListener('blur', async () => {
+			clearTimeout(saveTimeout);
+			await onSave(textarea.value);
 		});
 	}
 
@@ -679,6 +952,110 @@ class QuickCreatePlanModal extends Modal {
 			this.plugin.refreshViews();
 			
 			new Notice(`Created "${newPlan.name}"`);
+			this.close();
+			this.onComplete();
+		};
+	}
+
+	onClose(): void {
+		const { contentEl } = this;
+		contentEl.empty();
+	}
+}
+
+// ===========================================
+// EDIT CORE VALUE MODAL
+// ===========================================
+class EditCoreValueModal extends Modal {
+	plugin: BKBusinessPlanPlugin;
+	plan: BusinessPlan;
+	valueIndex: number | null;
+	onComplete: () => void;
+	valueText: string = '';
+
+	constructor(
+		app: App,
+		plugin: BKBusinessPlanPlugin,
+		plan: BusinessPlan,
+		valueIndex: number | null,
+		onComplete: () => void
+	) {
+		super(app);
+		this.plugin = plugin;
+		this.plan = plan;
+		this.valueIndex = valueIndex;
+		this.onComplete = onComplete;
+		
+		if (valueIndex !== null && plan.executive.coreValues[valueIndex]) {
+			this.valueText = plan.executive.coreValues[valueIndex];
+		}
+	}
+
+	onOpen(): void {
+		const { contentEl } = this;
+		contentEl.empty();
+		contentEl.addClass('bk-modal');
+
+		const isEdit = this.valueIndex !== null;
+		contentEl.createEl('h2', { text: isEdit ? '✏️ Edit Core Value' : '➕ Add Core Value' });
+
+		new Setting(contentEl)
+			.setName('Core Value')
+			.setDesc('A principle or belief that guides your business')
+			.addText(text => text
+				.setPlaceholder('e.g., Customer First')
+				.setValue(this.valueText)
+				.onChange(value => {
+					this.valueText = value;
+				})
+			);
+
+		// Suggestions
+		const suggestionsDiv = contentEl.createDiv({ cls: 'bk-value-suggestions' });
+		suggestionsDiv.createEl('p', { text: 'Suggestions:', cls: 'bk-suggestions-label' });
+		
+		const suggestions = [
+			'Innovation', 'Integrity', 'Customer Focus', 'Quality',
+			'Teamwork', 'Excellence', 'Sustainability', 'Transparency',
+			'Accountability', 'Continuous Improvement'
+		];
+		
+		const suggestionsGrid = suggestionsDiv.createDiv({ cls: 'bk-suggestions-grid' });
+		suggestions.forEach(suggestion => {
+			const chip = suggestionsGrid.createEl('button', { text: suggestion, cls: 'bk-suggestion-chip' });
+			chip.addEventListener('click', () => {
+				this.valueText = suggestion;
+				const input = contentEl.querySelector('input');
+				if (input) (input as HTMLInputElement).value = suggestion;
+			});
+		});
+
+		// Buttons
+		const buttonDiv = contentEl.createDiv({ cls: 'bkbpm-modal-buttons' });
+
+		const cancelBtn = buttonDiv.createEl('button', { text: 'Cancel' });
+		cancelBtn.onclick = () => this.close();
+
+		const saveBtn = buttonDiv.createEl('button', { 
+			text: isEdit ? 'Save Changes' : 'Add Value', 
+			cls: 'mod-cta' 
+		});
+		saveBtn.onclick = async () => {
+			if (!this.valueText.trim()) {
+				new Notice('Please enter a core value');
+				return;
+			}
+
+			if (isEdit && this.valueIndex !== null) {
+				this.plan.executive.coreValues[this.valueIndex] = this.valueText.trim();
+				new Notice('Core value updated');
+			} else {
+				this.plan.executive.coreValues.push(this.valueText.trim());
+				new Notice('Core value added');
+			}
+			
+			this.plan.lastUpdated = new Date().toISOString();
+			await this.plugin.saveSettings();
 			this.close();
 			this.onComplete();
 		};

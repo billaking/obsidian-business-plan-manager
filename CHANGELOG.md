@@ -5,6 +5,42 @@ All notable changes to the BK Business Plan Manager plugin will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-12-15
+
+### Added
+
+#### Executive Summary (🎯 Executive tab) - Phase 2
+- **Business Information Card**: Editable fields for business name, tagline, founder, and founded date
+- **Mission & Vision Card**: Textarea editors for mission statement and vision statement with auto-save
+- **Core Values Management**: 
+  - Add new core values with "+ Add Value" button
+  - Edit existing values via modal
+  - Delete values with confirmation
+  - Reorder values using up/down arrows
+  - Suggestion chips for common values (Innovation, Integrity, etc.)
+- **Market & Value Card**: Editable textareas for target market and unique value proposition
+- **Summary Preview**: Live preview showing business name, tagline, mission, vision, and core values
+- **Completion Indicator**: Progress bar showing section completion percentage (9 fields tracked)
+- **Auto-Save**: All fields save automatically after 500ms of typing or on blur
+
+#### New Components
+- `EditCoreValueModal`: Modal for adding/editing core values with suggestion chips
+- `renderEditableField()`: Helper for inline-editable text inputs
+- `renderEditableTextArea()`: Helper for inline-editable textareas
+- `calculateExecutiveCompletion()`: Tracks completion across 9 executive fields
+
+#### New Styles
+- Executive card layout (`.bk-exec-card`)
+- Info grid for business details (`.bk-exec-info-grid`)
+- Editable field styling with focus states (`.bk-field-input`, `.bk-field-textarea`)
+- Core values list with drag handles (`.bk-values-list`, `.bk-value-item`)
+- Icon buttons for value actions (`.bk-btn-icon`, `.bk-btn-small`)
+- Summary preview styling (`.bk-exec-preview`, `.bk-preview-content`)
+- Progress bar completion indicator (`.bk-progress-bar`, `.bk-progress-fill`)
+- Value suggestion chips (`.bk-suggestion-chip`)
+
+---
+
 ## [1.0.0] - 2024-12-15
 
 ### Changed
@@ -99,25 +135,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Responsive grid layouts
 - Modal styling for create/edit dialogs
 
-### Placeholder Sections (Coming Soon)
-- Executive Summary editing
-- Products & Services management
-- Market Analysis tools
-- Marketing & Sales planning
-- Operations management
-- Technology stack tracking
-- Financial planning
-- Legal & Compliance docs
-- Roadmap & Milestones
-
 ---
 
 ## Upcoming
 
-### [1.1.0] - Phase 2: Executive Summary
-- Editable mission and vision statements
-- Core values management (add, remove, reorder)
-- Target market details
+### [1.2.0] - Phase 3: Products & Services
+- Product CRUD (create, read, update, delete)
+- Pricing tiers management
+- Product bundles
+- Status tracking (idea → development → beta → launched)
+- Category organization
 - Unique value proposition editor
 - Business info editing
 
